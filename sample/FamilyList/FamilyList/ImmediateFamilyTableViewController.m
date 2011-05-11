@@ -42,9 +42,8 @@
                             andParams:params andDelegate:self];
 }
 
-- (void)request:(GeniRequest *)request didLoad:(id)result {
-    NSDictionary *data = (NSDictionary *) result;
-    [profile parseImmediateFamily:[data objectForKey:@"nodes"]];
+- (void)request:(GeniRequest *)request didLoadResponse:(GeniResponse *)response {
+    [profile parseImmediateFamily:[response objectForKey:@"nodes"]];
     self.sections = [profile familySections];
 	[self.tableView reloadData];
 

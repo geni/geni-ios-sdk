@@ -28,6 +28,7 @@
 		4C43F5F31362513C00562474 /* FamilyListTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C43F5F11362513C00562474 /* FamilyListTableViewController.xib */; };
 		4C43F61013625CFC00562474 /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C43F60F13625CFC00562474 /* Profile.m */; };
 		4C8B84D3136789CE008B461E /* logo_large.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C8B84D2136789CE008B461E /* logo_large.png */; };
+		4CF2E0CC137A04DD007E9226 /* GeniResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CF2E0CA137A04DD007E9226 /* GeniResponse.m */; };
 		4CFA094B13661AFA008D3C1C /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CFA094813661AFA008D3C1C /* icon.png */; };
 		4CFA094C13661AFA008D3C1C /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CFA094913661AFA008D3C1C /* icon@2x.png */; };
 		4CFA095A136632C7008D3C1C /* ProfileTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CFA0959136632C7008D3C1C /* ProfileTableViewCell.m */; };
@@ -80,6 +81,8 @@
 		4C43F60E13625CFC00562474 /* Profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Profile.h; sourceTree = "<group>"; };
 		4C43F60F13625CFC00562474 /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
 		4C8B84D2136789CE008B461E /* logo_large.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo_large.png; sourceTree = "<group>"; };
+		4CF2E0CA137A04DD007E9226 /* GeniResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeniResponse.m; sourceTree = "<group>"; };
+		4CF2E0CB137A04DD007E9226 /* GeniResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeniResponse.h; sourceTree = "<group>"; };
 		4CFA094813661AFA008D3C1C /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = FamilyList/icon.png; sourceTree = "<group>"; };
 		4CFA094913661AFA008D3C1C /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon@2x.png"; path = "FamilyList/icon@2x.png"; sourceTree = "<group>"; };
 		4CFA0958136632C7008D3C1C /* ProfileTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileTableViewCell.h; sourceTree = "<group>"; };
@@ -168,11 +171,13 @@
 		4C43F5B6136244E800562474 /* GeniConnect */ = {
 			isa = PBXGroup;
 			children = (
+				4C43F5BD136244E800562474 /* GeniConnect.h */,
 				4C43F5BB136244E800562474 /* Geni.h */,
 				4C43F5BC136244E800562474 /* Geni.m */,
-				4C43F5BD136244E800562474 /* GeniConnect.h */,
 				4C43F5BE136244E800562474 /* GeniRequest.h */,
 				4C43F5BF136244E800562474 /* GeniRequest.m */,
+				4CF2E0CB137A04DD007E9226 /* GeniResponse.h */,
+				4CF2E0CA137A04DD007E9226 /* GeniResponse.m */,
 				4C43F5C0136244E800562474 /* JSON */,
 			);
 			name = GeniConnect;
@@ -359,6 +364,7 @@
 				4CFA097613665878008D3C1C /* Union.m in Sources */,
 				4CFA0979136658D2008D3C1C /* Model.m in Sources */,
 				4CFA097C13665D2E008D3C1C /* GeniTableViewController.m in Sources */,
+				4CF2E0CC137A04DD007E9226 /* GeniResponse.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,7 +25,7 @@ static NSString* kUserAgent = @"iPhone";
 static NSString* kStringBoundary = @"GeniPostBoundary";
 static const int kGeneralErrorCode = 10000;
 
-static const BOOL kEnableLogging = NO;
+static const BOOL kEnableLogging = YES;
 
 static const NSTimeInterval kTimeoutInterval = 180.0;
 
@@ -40,7 +40,7 @@ url = _url,
 httpMethod = _httpMethod,
 params = _params,
 connection = _connection,
-responseText = _responseText;
+response = _response;
 
 /**
  * Free internal structure
@@ -48,7 +48,7 @@ responseText = _responseText;
 - (void)dealloc {
     [_connection cancel];
     [_connection release];
-    [_responseText release];
+    [_response release];
     [_url release];
     [_httpMethod release];
     [_params release];
@@ -59,7 +59,7 @@ responseText = _responseText;
  ** Class Public Mehtods
  ************************************************************************************/
 
-+ (GeniRequest *)getRequestWithParams:(NSMutableDictionary *) params
++ (GeniRequest *) requestWithParams:(NSMutableDictionary *) params
                          httpMethod:(NSString *) httpMethod
                            delegate:(id<GeniRequestDelegate>) delegate
                          requestURL:(NSString *) url {
@@ -70,7 +70,7 @@ responseText = _responseText;
     request.httpMethod = httpMethod;
     request.params = params;
     request.connection = nil;
-    request.responseText = nil;
+    request.response = nil;
     
     return request;
 }
@@ -138,30 +138,6 @@ responseText = _responseText;
     }
 }
 
-- (void) logResponse:(NSHTTPURLResponse *)response {
-    if (kEnableLogging == NO) return;
-
-    NSLog(@"-------------------------------------------------------");
-    NSLog(@"Response");
-    NSLog(@"\tURL: %@", [[response URL] absoluteString]);
-    NSLog(@"\tCode: %d", [response statusCode]);
-    NSLog(@"\tMime Type: %@", [response MIMEType]);
-    NSLog(@"\tExpected Content Length: %lld", [response expectedContentLength]);
-    NSLog(@"\tText Encoding Name: %@", [response textEncodingName]);
-    NSLog(@"\tSuggested File Name: %@", [response suggestedFilename]);
-    for (NSString *key in [[response allHeaderFields] allKeys]) {
-        NSLog(@"\t[Header]%@ = %@", key, [[response allHeaderFields] valueForKey:key]);
-    }
-}
-
-- (void) logResponseBody:(NSData *)data {
-    if (kEnableLogging == NO) return;
-
-    NSString *stringData = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-    NSLog(@"\tBody: %@", stringData);
-}
-
-
 /************************************************************************************
  ** Serialization Methods
  ************************************************************************************/
@@ -225,6 +201,10 @@ responseText = _responseText;
         }
     }
     
+//    unsigned char aBuffer[[body length]];
+//    [body getBytes:aBuffer length:[body length]];
+//    NSLog(@"%s", aBuffer);    
+    
     return body;
 }
 
@@ -232,30 +212,7 @@ responseText = _responseText;
  * Formulate the NSError
  */
 - (id)formError:(NSInteger)code userInfo:(NSDictionary *) errorData {
-    return [NSError errorWithDomain:@"geniErrDomain" code:code userInfo:errorData];
-}
-
-/**
- * parse the response data
- */
-- (id)parseJsonResponse:(NSData *)data error:(NSError **)error {
-    NSString* responseString = [[[NSString alloc] initWithData:data
-                                                      encoding:NSUTF8StringEncoding]
-                                autorelease];
-    SBJSON *jsonParser = [[SBJSON new] autorelease];
-    id result = [jsonParser objectWithString:responseString];
-    
-    if (![result isKindOfClass:[NSArray class]]) {
-        if ([result objectForKey:@"error"] != nil) {
-            if (error != nil) {
-                *error = [self formError:kGeneralErrorCode
-                                userInfo:[result objectForKey:@"error"]];
-            }
-            return nil;
-        }
-    }
-    
-    return result;
+    return [NSError errorWithDomain:@"GeniErrorDomain" code:code userInfo:errorData];
 }
 
 /*
@@ -266,33 +223,6 @@ responseText = _responseText;
     if ([_delegate respondsToSelector:@selector(request:didFailWithError:)]) {
         [_delegate request:self didFailWithError:error];
     }
-}
-
-/*
- * private helper function: handle the response data
- */
-- (void)handleResponseData:(NSData *)data {
-    [self logResponseBody:data];
-
-    if ([_delegate respondsToSelector:
-         @selector(request:didLoadRawResponse:)]) {
-        [_delegate request:self didLoadRawResponse:data];
-    }
-    
-    if ([_delegate respondsToSelector:@selector(request:didLoad:)] ||
-        [_delegate respondsToSelector:
-         @selector(request:didFailWithError:)]) {
-            NSError* error = nil;
-            id result = [self parseJsonResponse:data error:&error];
-            
-            if (error) {
-                [self failWithError:error];
-            } else if ([_delegate respondsToSelector:
-                        @selector(request:didLoad:)]) {
-                [_delegate request:self didLoad:(result == nil ? data : result)];
-            }
-            
-        }
 }
 
 /************************************************************************************
@@ -316,22 +246,21 @@ responseText = _responseText;
     
     NSString* url = [[self class] serializeURL:_url params:_params httpMethod:_httpMethod];
     
-    NSMutableURLRequest* request =
-    [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]
-                            cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                        timeoutInterval:kTimeoutInterval];
-    [request setValue:kUserAgent forHTTPHeaderField:@"User-Agent"];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL: [NSURL URLWithString:url]
+                                                           cachePolicy: NSURLRequestReloadIgnoringLocalCacheData
+                                                       timeoutInterval: kTimeoutInterval];
     
+    [request setValue:kUserAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:self.httpMethod];
+    
     if ([self.httpMethod isEqualToString: @"POST"]) {
-        NSString* contentType = [NSString
-                                 stringWithFormat:@"multipart/form-data; boundary=%@", kStringBoundary];
+        NSString* contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", kStringBoundary];
         [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
-        
         [request setHTTPBody:[self generatePostBody]];
     }
     
     [self logRequest:request];
+    
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 
@@ -340,31 +269,39 @@ responseText = _responseText;
  ************************************************************************************/
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    _responseText = [[NSMutableData alloc] init];
-    
-    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-    [self logResponse:httpResponse];
+    _response = [[GeniResponse alloc] initWithHTTPURLResponse:(NSHTTPURLResponse*)response];
 
-    if ([_delegate respondsToSelector:
-         @selector(request:didReceiveResponse:)]) {
-        [_delegate request:self didReceiveResponse:httpResponse];
+    if ([_delegate respondsToSelector: @selector(request:didReceiveResponse:)]) {
+        [_delegate request:self didReceiveResponse:self.response];
     }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [_responseText appendData:data];
+    [self.response appendRawData:data];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
-                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
     return nil;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [self handleResponseData:_responseText];
+    if ([_delegate respondsToSelector: @selector(request:didLoadRawResponse:)]) {
+        [_delegate request:self didLoadRawResponse:self.response.rawData];
+    }
     
-    [_responseText release];
-    _responseText = nil;
+    if ([_delegate respondsToSelector: @selector(request:didLoadResponse:)] || [_delegate respondsToSelector: @selector(request:didFailWithError:)]) {
+        NSError* error = nil;
+        [self.response parse:&error];
+        
+        if (error) {
+            [self failWithError:error];
+        } else if ([_delegate respondsToSelector: @selector(request:didLoadResponse:)]) {
+            [_delegate request:self didLoadResponse: self.response];
+        }
+    }
+    
+    [_response release];
+    _response = nil;
     [_connection release];
     _connection = nil;
 }
@@ -372,8 +309,8 @@ responseText = _responseText;
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     [self failWithError:error];
     
-    [_responseText release];
-    _responseText = nil;
+    [_response release];
+    _response = nil;
     [_connection release];
     _connection = nil;
 }

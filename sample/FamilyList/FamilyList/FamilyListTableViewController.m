@@ -79,12 +79,10 @@
     self.profiles = nil;
 }
 
-- (void)request:(GeniRequest *)request didLoad:(id)result {
+- (void)request:(GeniRequest *)request didLoadResponse:(GeniResponse *)response {
     FamilyListAppDelegate *appDelegate = (FamilyListAppDelegate*) [[UIApplication sharedApplication] delegate];
 
-    NSDictionary *data = (NSDictionary *) result;
-    
-	NSArray *family = [data objectForKey:@"results"];
+	NSArray *family = [response results];
 	for (NSDictionary *profile in family) {
         [profiles addObject:[Profile profileWithAttributes: profile]];
 	}
@@ -94,7 +92,7 @@
     [self.profiles sortUsingDescriptors:sortDescriptors];
 	[self.tableView reloadData];
     
-	NSString *nextPageUrl = [data objectForKey:@"next_page"];
+	NSString *nextPageUrl = [response nextPageURL];
 	if (nextPageUrl != nil) {
         [appDelegate.geni requestWithPath:nextPageUrl andDelegate:self];
 	} else {

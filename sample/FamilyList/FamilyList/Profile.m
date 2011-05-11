@@ -221,8 +221,8 @@
     [delegate profile:self didNotReceivedMughshotImageAtIndexPath:indexPath];
 }
 
-- (void)request:(GeniRequest *)request didLoad:(id)result {
-    UIImage *resultImage = [UIImage imageWithData:(NSData *)result];
+- (void)request:(GeniRequest *)request didLoadResponse:(GeniResponse *)response {
+    UIImage *resultImage = [response image];
     FamilyListAppDelegate *appDelegate = (FamilyListAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *filePath = [[appDelegate photosPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@.jpg", [attributes objectForKey:@"id"]]];
     NSData *imageData = UIImageJPEGRepresentation(resultImage, 0);

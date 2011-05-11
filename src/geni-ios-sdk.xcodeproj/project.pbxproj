@@ -27,6 +27,8 @@
 		4C150DBB1362431100A768C0 /* GeniConnect.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C150DB61362431100A768C0 /* GeniConnect.h */; };
 		4C150DBC1362431100A768C0 /* GeniRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C150DB71362431100A768C0 /* GeniRequest.h */; };
 		4C150DBD1362431100A768C0 /* GeniRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C150DB81362431100A768C0 /* GeniRequest.m */; };
+		4CF2E0C8137A04AE007E9226 /* GeniResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CF2E0C6137A04AE007E9226 /* GeniResponse.h */; };
+		4CF2E0C9137A04AE007E9226 /* GeniResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CF2E0C7137A04AE007E9226 /* GeniResponse.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +53,8 @@
 		4C150DB61362431100A768C0 /* GeniConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeniConnect.h; sourceTree = SOURCE_ROOT; };
 		4C150DB71362431100A768C0 /* GeniRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeniRequest.h; sourceTree = SOURCE_ROOT; };
 		4C150DB81362431100A768C0 /* GeniRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeniRequest.m; sourceTree = SOURCE_ROOT; };
+		4CF2E0C6137A04AE007E9226 /* GeniResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeniResponse.h; sourceTree = SOURCE_ROOT; };
+		4CF2E0C7137A04AE007E9226 /* GeniResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeniResponse.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +133,8 @@
 				4C150DB61362431100A768C0 /* GeniConnect.h */,
 				4C150DB71362431100A768C0 /* GeniRequest.h */,
 				4C150DB81362431100A768C0 /* GeniRequest.m */,
+				4CF2E0C6137A04AE007E9226 /* GeniResponse.h */,
+				4CF2E0C7137A04AE007E9226 /* GeniResponse.m */,
 			);
 			name = GeniConnect;
 			path = "geni-ios-sdk/src";
@@ -152,6 +158,7 @@
 				4C150DB91362431100A768C0 /* Geni.h in Headers */,
 				4C150DBB1362431100A768C0 /* GeniConnect.h in Headers */,
 				4C150DBC1362431100A768C0 /* GeniRequest.h in Headers */,
+				4CF2E0C8137A04AE007E9226 /* GeniResponse.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +220,7 @@
 				4C150DB3136242D500A768C0 /* SBJsonWriter.m in Sources */,
 				4C150DBA1362431100A768C0 /* Geni.m in Sources */,
 				4C150DBD1362431100A768C0 /* GeniRequest.m in Sources */,
+				4CF2E0C9137A04AE007E9226 /* GeniResponse.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

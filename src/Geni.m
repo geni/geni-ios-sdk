@@ -21,11 +21,12 @@
  ** Constants
  ************************************************************************************/
 
-static NSString* kBaseURL = @"https://www.geni.com/api/";
+static NSString* kApiURL = @"https://www.geni.com";
 
-static NSString* kAuthorizeURL = @"https://www.geni.com/oauth/authorize";
-static NSString* kValidateURL = @"https://www.geni.com/oauth/validate_token";
-static NSString* kInvalidateURL = @"https://www.geni.com/oauth/invalidate";
+static NSString* kAuthorizePath = @"/oauth/authorize";
+static NSString* kValidatePath = @"/oauth/validate_token";
+static NSString* kTokenPath = @"/oauth/token";
+static NSString* kInvalidatePath = @"/oauth/invalidate";
 
 /************************************************************************************
  ** Implementation
@@ -33,7 +34,7 @@ static NSString* kInvalidateURL = @"https://www.geni.com/oauth/invalidate";
 
 @implementation Geni
 
-@synthesize accessToken = _accessToken,
+@synthesize accessToken = _accessToken, apiURL = _apiURL,
 sessionDelegate = _sessionDelegate;
 
 /**
@@ -61,6 +62,8 @@ sessionDelegate = _sessionDelegate;
 - (id)initWithAppKey:(NSString *)appKey appSecret:(NSString *)appSecret accessToken:(NSString *) accessToken {
     self = [super init];
     if (self) {
+        [_apiURL release];
+        _apiURL = kApiURL;
         [_appKey release];
         _appKey = [appKey copy];
         [_appSecret release];
@@ -98,10 +101,10 @@ sessionDelegate = _sessionDelegate;
     }
     
     [_request release];
-    _request = [[GeniRequest getRequestWithParams:params
-                                       httpMethod:httpMethod
-                                         delegate:delegate
-                                       requestURL:url] retain];
+    _request = [[GeniRequest requestWithParams: params
+                                    httpMethod: httpMethod
+                                      delegate: delegate
+                                    requestURL: url] retain];
     [_request connect];
     return _request;
 }
@@ -132,16 +135,33 @@ sessionDelegate = _sessionDelegate;
     _sessionDelegate = delegate;
     
     NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   _appKey, @"client_id",
-                                   _appSecret, @"client_secret",
-                                   @"token", @"response_type",
-                                   @"user_agent", @"type",
+                                   _appKey,         @"client_id",
+                                   _appSecret,      @"client_secret",
+                                   @"token",        @"response_type",
+                                   @"user_agent",   @"type",
                                    nil];
 
     NSString *nextUrl = [NSString stringWithFormat:@"%@://authorize", _appKey];
     [params setValue:nextUrl forKey:@"redirect_uri"];
-    NSString *geniAppUrl = [GeniRequest serializeURL:kAuthorizeURL params:params];
+    NSLog(@"%@", nextUrl);
+    NSString *geniAppUrl = [GeniRequest serializeURL:[self.apiURL stringByAppendingString:kAuthorizePath] params:params];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:geniAppUrl]];
+}
+
+- (void)authorizeWithUsername:(NSString *)username andPassword:(NSString *)password andDelegate:(id<GeniSessionDelegate>)delegate {
+    _sessionDelegate = delegate;
+    
+    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   _appKey,             @"client_id",
+                                   _appSecret,          @"client_secret",
+                                   @"token",            @"response_type",
+                                   @"user_agent",       @"type",
+                                   @"password",         @"grant_type",
+                                   username,            @"username",
+                                   password,            @"password", 
+                                   nil];
+
+    [self requestWithPath:[self.apiURL stringByAppendingString:kTokenPath] andParams:params andDelegate:self];
 }
 
 /**
@@ -199,7 +219,7 @@ sessionDelegate = _sessionDelegate;
  **/
 - (void)validate:(id<GeniSessionDelegate>)delegate {
     _sessionDelegate = delegate;
-    [self requestWithPath:kValidateURL andDelegate:self];
+    [self requestWithPath:[self.apiURL stringByAppendingString:kValidatePath] andDelegate:self];
 }
 
 /**
@@ -207,12 +227,12 @@ sessionDelegate = _sessionDelegate;
  **/
 - (void)logout:(id<GeniSessionDelegate>)delegate {
     _sessionDelegate = delegate;
-    [self requestWithPath:kInvalidateURL andDelegate:nil];
+    [self requestWithPath:[self.apiURL stringByAppendingString:kInvalidatePath] andDelegate:nil];
     [_accessToken release];
     _accessToken = nil;
     
     NSHTTPCookieStorage* cookies = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    NSArray* geniCookies = [cookies cookiesForURL: [NSURL URLWithString:@"http://www.geni.com"]];
+    NSArray* geniCookies = [cookies cookiesForURL: [NSURL URLWithString:kApiURL]];
     for (NSHTTPCookie* cookie in geniCookies) {
         [cookies deleteCookie:cookie];
     }
@@ -248,7 +268,7 @@ sessionDelegate = _sessionDelegate;
 
     NSString *fullURL = path;
     if (([path rangeOfString:@"http"]).length == 0) {
-        fullURL = [kBaseURL stringByAppendingString:path];
+        fullURL = [self.apiURL stringByAppendingFormat:@"/api/%@", path];
     }
     
     return [self openUrl:fullURL
@@ -276,6 +296,11 @@ sessionDelegate = _sessionDelegate;
 }
 
 - (void)request:(GeniRequest *)request didLoad:(id)result {
+    NSDictionary *data = (NSDictionary *) result;
+    if ([data valueForKey:@"access_token"] != nil) {
+        self.accessToken = [data valueForKey:@"access_token"];
+    }
+    
     if ([self.sessionDelegate respondsToSelector:@selector(geniDidLogin)]) {
         [_sessionDelegate geniDidLogin];
     }

@@ -16,4 +16,5 @@
 
 #include "Geni.h"
 #include "GeniRequest.h"
+#include "GeniResponse.h"
 #include "SBJSON.h"
