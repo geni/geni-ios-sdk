@@ -20,8 +20,7 @@
  Visit http://www.geni.com/apps and register your application. Then provide the following values:
 */
 
-static NSString* kApplicationKey = @"YOUR_APPLICATION_KEY";
-static NSString* kApplicationSecret = @"YOUR_APPLICATION_SECRET";
+static NSString* kApplicationId = @"YOUR APPLICATION ID";
 
 @implementation FamilyListAppDelegate
 
@@ -33,7 +32,8 @@ static NSString* kApplicationSecret = @"YOUR_APPLICATION_SECRET";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	NSString *accessToken = [[NSUserDefaults standardUserDefaults] stringForKey: @"accessToken"];	
-	_geni = [[Geni alloc] initWithAppKey:kApplicationKey appSecret:kApplicationSecret accessToken:accessToken];
+	_geni = [[Geni alloc] initWithAppId:kApplicationId];
+    _geni.accessToken = accessToken;
     
     _loginViewController = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
     [self.window addSubview:_loginViewController.view];
@@ -42,7 +42,6 @@ static NSString* kApplicationSecret = @"YOUR_APPLICATION_SECRET";
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    NSLog(@"Did come back from other application");
     return [self.geni handleOpenURL:url];
 }
 

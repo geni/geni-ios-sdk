@@ -22,10 +22,8 @@
  ************************************************************************************/
 
 static NSString* kApiURL = @"https://www.geni.com";
-
 static NSString* kAuthorizePath = @"/oauth/authorize";
 static NSString* kValidatePath = @"/oauth/validate_token";
-static NSString* kTokenPath = @"/oauth/token";
 static NSString* kInvalidatePath = @"/oauth/invalidate";
 
 /************************************************************************************
@@ -43,8 +41,7 @@ sessionDelegate = _sessionDelegate;
 - (void)dealloc {
     [_accessToken release];
     [_request release];
-    [_appKey release];
-    [_appSecret release];
+    [_appId release];
     [super dealloc];
 }
 
@@ -53,23 +50,16 @@ sessionDelegate = _sessionDelegate;
  ************************************************************************************/
 
 /**
- * Initialize the Geni object with application key and secret.
+ * Initialize the Geni object with application id.
  */
-- (id)initWithAppKey:(NSString *)appKey appSecret:(NSString *)appSecret {
-    return [self initWithAppKey:appKey appSecret:appSecret accessToken:nil];
-}
 
-- (id)initWithAppKey:(NSString *)appKey appSecret:(NSString *)appSecret accessToken:(NSString *) accessToken {
+- (id)initWithAppId:(NSString *)appId {
     self = [super init];
     if (self) {
         [_apiURL release];
         _apiURL = kApiURL;
-        [_appKey release];
-        _appKey = [appKey copy];
-        [_appSecret release];
-        _appSecret = [appSecret copy];
-        [_accessToken release];
-        _accessToken = [accessToken copy];
+        [_appId release];
+        _appId = [appId copy];
     }
     return self;
 }
@@ -131,37 +121,19 @@ sessionDelegate = _sessionDelegate;
  ** Public Methods
  ************************************************************************************/
 
-- (void)authorize:(id<GeniSessionDelegate>)delegate {
-    _sessionDelegate = delegate;
-    
-    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   _appKey,         @"client_id",
-                                   _appSecret,      @"client_secret",
-                                   @"token",        @"response_type",
-                                   @"user_agent",   @"type",
-                                   nil];
-
-    NSString *nextUrl = [NSString stringWithFormat:@"%@://authorize", _appKey];
-    [params setValue:nextUrl forKey:@"redirect_uri"];
-    NSLog(@"%@", nextUrl);
-    NSString *geniAppUrl = [GeniRequest serializeURL:[self.apiURL stringByAppendingString:kAuthorizePath] params:params];
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:geniAppUrl]];
+- (NSString *) oauthCallbackUrl {
+    return [NSString stringWithFormat:@"geni%@://authorize", _appId];
 }
 
-- (void)authorizeWithUsername:(NSString *)username andPassword:(NSString *)password andDelegate:(id<GeniSessionDelegate>)delegate {
+- (void)authorize:(id<GeniSessionDelegate>)delegate {
     _sessionDelegate = delegate;
-    
     NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   _appKey,             @"client_id",
-                                   _appSecret,          @"client_secret",
-                                   @"token",            @"response_type",
-                                   @"user_agent",       @"type",
-                                   @"password",         @"grant_type",
-                                   username,            @"username",
-                                   password,            @"password", 
+                                   _appId,                  @"client_id",
+                                   @"token",                @"response_type",
+                                   [self oauthCallbackUrl], @"redirect_uri",
                                    nil];
-
-    [self requestWithPath:[self.apiURL stringByAppendingString:kTokenPath] andParams:params andDelegate:self];
+    NSString *geniAppUrl = [GeniRequest serializeURL:[self.apiURL stringByAppendingString:kAuthorizePath] params:params];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:geniAppUrl]];
 }
 
 /**
@@ -183,7 +155,7 @@ sessionDelegate = _sessionDelegate;
  */
 - (BOOL)handleOpenURL:(NSURL *)url {
     // If the URL's structure doesn't match the structure used for Geni authorization, abort.
-    if (![[url absoluteString] hasPrefix:[NSString stringWithFormat:@"%@://authorize", _appKey]]) {
+    if (![[url absoluteString] hasPrefix:[self oauthCallbackUrl]]) {
         return NO;
     }
     

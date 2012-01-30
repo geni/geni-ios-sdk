@@ -25,11 +25,11 @@
  */
 @interface GeniRequest : NSObject {
     id<GeniRequestDelegate> _delegate;
-    NSString*             _url;
-    NSString*             _httpMethod;
-    NSMutableDictionary*  _params;
-    NSURLConnection*      _connection;
-    GeniResponse*         _response;
+    NSString*               _url;
+    NSString*               _httpMethod;
+    NSMutableDictionary*    _params;
+    NSURLConnection*        _connection;
+    GeniResponse*           _response;
 }
 
 @property(nonatomic,assign) id<GeniRequestDelegate> delegate;

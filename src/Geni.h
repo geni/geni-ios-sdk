@@ -24,8 +24,7 @@
     NSString* _accessToken;
     id<GeniSessionDelegate> _sessionDelegate;
     GeniRequest* _request;
-    NSString* _appKey;
-    NSString* _appSecret;
+    NSString* _appId;
 }
 
 @property(nonatomic, copy) NSString* apiURL;
@@ -34,13 +33,9 @@
 
 @property(nonatomic, assign) id<GeniSessionDelegate> sessionDelegate;
 
-- (id)initWithAppKey:(NSString *)appKey appSecret:(NSString *)appSecret;
-
-- (id)initWithAppKey:(NSString *)appKey appSecret:(NSString *)appSecret accessToken:(NSString *) accessToken;
+- (id)initWithAppId:(NSString *)appId;
 
 - (void)authorize:(id<GeniSessionDelegate>)delegate;
-
-- (void)authorizeWithUsername:(NSString *)username andPassword:(NSString *)password andDelegate:(id<GeniSessionDelegate>)delegate;
 
 - (void)validate:(id<GeniSessionDelegate>)delegate;
 
