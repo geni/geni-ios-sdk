@@ -18,7 +18,7 @@ Follow these steps to download the Geni iOS SDK to your computer:
 
 = Sample Application
 
-Before you proceed with your own application integration, try out our sample application. Our sample application demonstrates our authentication mechanism as well as allows you to download your immediate family and navigate through your family using a smart family browser.
+Before you proceed with your own application integration, try out our sample application. Our sample application demonstrates our authorization mechanism as well as allows you to download your max family.
 
 The sample application is located here:
 
@@ -32,13 +32,12 @@ Once you open the project file, make sure you do the following:
 4. Run the application and click on the "Connect to Geni" button. Provide your Geni user login and then authorize your application.
 5. Once you authorized your app, you will be taken back to the FamilyList sample application, which will present you with your max family.
 
-
 = Getting Your Application Up And Running In 10 (Relatively) Simple Steps
 
 Follow these instructions to integrate Geni iOS SDK into your application:
 
 === Step 1
-Open geni-ios-sdk\GeniSDK\GeniSDK.xcodeproj and drag the GeniSDK folder/group into your own application root. You can choose to either copy the folder into your application or link it as a source folder. If  you keep it linked, you will be able to download the latest version of the SDK without having to re-copy the latest changes to your application.
+Open geni-ios-sdk/GeniSDK/GeniSDK.xcodeproj and drag the GeniSDK folder into your own application root. You can choose to either copy the folder into your application or link it as a source folder. If  you keep it linked, you will be able to download the latest version of the SDK without having to re-copy the latest changes to your application.
 
 
 === Step 2
@@ -81,7 +80,10 @@ In order for the iOS device to recognize the redirect call from the Safari brows
   </array>  
 
 
-Replace YOUR_APPLICATION_ID with the value you got from step 4.
+Replace [YOUR_APPLICATION_ID] with the value you got from step 4. If your application id is 12345, your CFBundleURLSchemes will look like the following:
+
+	<string>geni12345</string>
+
 
 === Step 7
 When Safari browser redirects users back to your application, it will match the url from the previous step and call the following method in your Application Delegate:
@@ -95,9 +97,9 @@ Make sure you add the above code to your Application Delegate so that Geni clien
 === Step 8
 Geni client will process the URL it received in the previous step and call one of the following methods on the session delegate you specified in step 5.
 
-  - (void)geniDidLogin;
+  - (void) geniDidLogin;
 
-  - (void)geniDidNotLogin:(BOOL)cancelled;
+  - (void) geniDidNotLogin:(BOOL)cancelled;
 
 At this point you will either have a user that has authorized your application or canceled the action. You can handle each case in the above methods. If the user has authorized your application, you may now call any Geni API methods.
 
