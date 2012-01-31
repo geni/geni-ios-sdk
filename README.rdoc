@@ -3,7 +3,6 @@
 This open source iOS library allows you to integrate Geni into your own iOS application.
 The library is compatible with all iOS devices, including iPhone, iPad and iPod touch.
 
-
 = Getting Started
 
 The SDK is fully self-contained and does not require any additional libraries.
@@ -23,20 +22,15 @@ Before you proceed with your own application integration, try out our sample app
 
 The sample application is located here:
 
-  geni-ios-sdk/sample/FamilyList/FamilyList.xcodeproj
+  geni-ios-sdk/FamilyList/FamilyList.xcodeproj
 
 Once you open the project file, make sure you do the following:
 
-1. Visit http://www.geni.com/apps and register your application. You will be given your application key and secret.
-2. Open FamilyListAppDelegate.m and replace YOUR_APPLICATION_KEY and YOUR_APPLICATION_SECRET with the values you got from the previous step.
-3. Open FamilyList-Info.plist and replace YOUR_APPLICATION_KEY with the value from the first step.
+1. Visit http://www.geni.com/platform/apps and register your application. You will be given your application id and secret.
+2. Open AppDelegate.m and replace YOUR_APPLICATION_ID with the value you got from the previous step.
+3. Open FamilyList-Info.plist and replace YOUR_APPLICATION_ID with the value from the first step.
 4. Run the application and click on the "Connect to Geni" button. Provide your Geni user login and then authorize your application.
-5. Once you authorized your app, you will be taken back to the FamilyList sample application, which will present you with your immediate family.
-6. Click on any family member and continue navigating through your family from there.
-
-If you would like to see the requests and responses sent and received from the server, then open GeniRequest.m and enable logging: 
-
-  static const BOOL kEnableLogging = YES;
+5. Once you authorized your app, you will be taken back to the FamilyList sample application, which will present you with your max family.
 
 
 = Getting Your Application Up And Running In 10 (Relatively) Simple Steps
@@ -44,24 +38,23 @@ If you would like to see the requests and responses sent and received from the s
 Follow these instructions to integrate Geni iOS SDK into your application:
 
 === Step 1
-Open geni-ios-sdk\src\geni-ios-sdk.xcodeproj and drag the GeniConnect folder/group into your own application root. You can choose to either copy the folder into your application or link it as a source folder. If  you keep it linked, you will be able to download the latest version of the SDK without having to re-copy the latest changes to your application.
+Open geni-ios-sdk\GeniSDK\GeniSDK.xcodeproj and drag the GeniSDK folder/group into your own application root. You can choose to either copy the folder into your application or link it as a source folder. If  you keep it linked, you will be able to download the latest version of the SDK without having to re-copy the latest changes to your application.
 
 
 === Step 2
-Include GeniConnect in your application classes (where you need the Geni functionality):
+Include GeniSDK in your application classes (where you need the Geni functionality):
 
-  import "GeniConnect.h"
-
+  import "GeniSDK.h"
 
 === Step 3
-Visit http://www.geni.com/apps and register your application.  You will be given your application key and secret.
+Visit http://www.geni.com/platform/apps and register your application.  You will be given your application id and secret.
 
 === Step 4
 Instantiate the Geni object:
  
-  Geni *geni = [[Geni alloc] initWithAppKey:YOUR_APPLICATION_KEY appSecret:YOUR_APPLICATION_SECRET];
+  Geni *geni = [[Geni alloc] initWithAppId:YOUR_APPLICATION_ID];
   
-Replace the YOUR_APPLICATION_KEY and YOUR_APPLICATION_SECRET with the appropriate values you got from step 3. If you are planning to have more than one controller accessing Geni API, it is recommend that you keep the Geni object in your Application Delegate and make your Application Delegate implement the GeniSessionDelegate protocol. 
+Replace the YOUR_APPLICATION_ID with the appropriate value you got from step 3. If you are planning to have more than one controller accessing Geni API, it is recommend that you keep the Geni object in your Application Delegate and make your Application Delegate implement the GeniSessionDelegate protocol. 
 
 
 === Step 5
@@ -82,13 +75,13 @@ In order for the iOS device to recognize the redirect call from the Safari brows
   		<string></string>
   		<key>CFBundleURLSchemes</key>
   		<array>
-  			<string>YOUR_APPLICATION_KEY</string>
+  			<string>geni[YOUR_APPLICATION_ID]</string>
   		</array>
     </dict>
   </array>  
 
 
-Replace YOUR_APPLICATION_KEY with the value you got from step 4.
+Replace YOUR_APPLICATION_ID with the value you got from step 4.
 
 === Step 7
 When Safari browser redirects users back to your application, it will match the url from the previous step and call the following method in your Application Delegate:
@@ -138,15 +131,13 @@ If the request was successful, the "didLoad" method will be called and a call va
 
 For the above example, your code may look something like this:
 
-  - (IBAction) getCurrentUserInfo: (id) caller {
+  - (IBAction) loadCurrentUserInfo: (id) caller {
          [geni requestWithPath:@"user" delegate:self]; 
   }
 
-  - (void)request:(GeniRequest *)request didLoad:(id)result {
-	NSDictionary *userInfo = (NSDictionary *) result;
-        NSLog(@"Name: %@", [userInfo valueForKey:@"name"]);
-  }
-
+	- (void)request:(GeniRequest *)request didLoadResponse:(GeniResponse *)response {
+  			 NSLog(@"Name: %@", [response valueForKey:@"name"]);
+	}
 
 === Step 10
 To logout from Geni, call the following method:
@@ -158,6 +149,6 @@ The parameter must be an object that implements the GeniSessionDelegate protocol
 
 = API Documentation
 
-To get more information on available API, please visit http://api.geni.com
+To get more information on available API, please visit http://www.geni.com/platform/developer/help
 
 
